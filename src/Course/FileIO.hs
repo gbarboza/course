@@ -84,19 +84,16 @@ getFiles =
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile =
-  error "todo"
+getFile fn = readFile fn >>= (\cnts -> return (fn, cnts))
 
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles =
-  error "todo"
+printFiles = foldLeft (\_ x -> uncurry printFile x) (return ())
 
 printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile =
-  error "todo"
+printFile fn cnts = void $ putStrLn fn >> putStrLn cnts
 
