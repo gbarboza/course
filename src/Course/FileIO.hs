@@ -62,8 +62,11 @@ the contents of c
 -- /Tip:/ use @getArgs@ and @run@
 main ::
   IO ()
-main =
-  error "todo"
+main = getArgs >>= run'
+  where
+    run' args = case (headOr "" args) of
+                   "" -> error "Need an argument"
+                   x  -> run x
 
 type FilePath =
   Chars
@@ -72,28 +75,29 @@ type FilePath =
 run ::
   Chars
   -> IO ()
-run =
-  error "todo"
+run fn = do
+  (_, contents) <- getFile fn
+  otherContents <- getFiles $ lines contents
+  printFiles otherContents
+
 
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo"
+getFiles fns = sequence $ map getFile fns
 
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile fn = readFile fn >>= (\cnts -> return (fn, cnts))
+getFile fn = readFile fn >>= (\content -> return (fn, content))
 
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles = foldLeft (\_ x -> uncurry printFile x) (return ())
+printFiles = void . sequence . (map (\x -> uncurry printFile x))
 
 printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile fn cnts = void $ putStrLn fn >> putStrLn cnts
-
+printFile fn cnts = void $ putStr "============ " >> putStrLn fn >> putStrLn cnts
